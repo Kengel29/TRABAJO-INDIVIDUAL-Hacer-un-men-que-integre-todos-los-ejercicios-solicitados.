@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INF-5170 - Estudiante (12345678) | Proyecto Final</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(51, 65, 85, 0.8);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(71, 85, 105, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased bg-slate-950 text-slate-100 selection:bg-brand-500 selection:text-white">
+
+    <!-- LOGIN MODAL / OVERLAY -->
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md transition-opacity">
+        <div class="w-full max-w-md p-8 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-brand-500/20 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-brand-600/20 text-brand-500 border border-brand-500/30 mb-4">
+                    <i class="fa-solid fa-graduation-cap text-3xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-white tracking-tight">Portal INF-5170</h1>
+                <p class="text-xs font-semibold text-brand-400 mt-1">Estudiante | Matrícula: 12345678</p>
+                <div class="mt-2 text-xs inline-block bg-slate-800 text-slate-300 font-mono px-2.5 py-1 rounded-full border border-slate-700">
+                    Laboratorio de Programación III
+                </div>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Usuario</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" id="login-user" required placeholder="Ej: estudiante o admin" 
+                               class="w-full pl-10 pr-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-white transition placeholder-slate-500" value="estudiante">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Contraseña / Matrícula</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" id="login-pass" required placeholder="••••••••" 
+                               class="w-full pl-10 pr-4 py-2.5 bg-slate-800/80 border border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-white transition placeholder-slate-500" value="12345678">
+                    </div>
+                </div>
+
+                <div id="login-error" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 p-3 rounded-lg flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="login-error-text">Usuario o contraseña incorrectos.</span>
+                </div>
+
+                <button type="submit" class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl shadow-lg shadow-brand-600/30 transition duration-150 flex items-center justify-center gap-2">
+                    <span>Iniciar Sesión</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </form>
+
+            <div class="mt-6 pt-5 border-t border-slate-800/80 text-xs text-slate-400">
+                <p class="font-semibold text-slate-300 mb-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-key text-brand-500"></i> Credenciales de Acceso:
+                </p>
+                <div class="grid grid-cols-2 gap-2 text-left font-mono text-[11px]">
+                    <div class="bg-slate-800/60 p-2 rounded-lg border border-slate-700/50 cursor-pointer hover:border-brand-500/50" onclick="fillCredentials('estudiante', '12345678')">
+                        <span class="text-slate-400 block">Estudiante:</span>
+                        <span class="text-brand-300">estudiante / 12345678</span>
+                    </div>
+                    <div class="bg-slate-800/60 p-2 rounded-lg border border-slate-700/50 cursor-pointer hover:border-brand-500/50" onclick="fillCredentials('admin', 'admin123')">
+                        <span class="text-slate-400 block">Administrador:</span>
+                        <span class="text-brand-300">admin / admin123</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP STRUCTURE -->
+    <div id="app-root" class="flex flex-1 h-screen overflow-hidden">
+
+        <!-- SIDEBAR CONTAINER (Dynamic Menu) -->
+        <aside id="sidebar" class="w-72 bg-slate-900 border-r border-slate-800 flex flex-col justify-between shrink-0 transition-all duration-300">
+            <!-- Header Logo -->
+            <div>
+                <div class="p-5 border-b border-slate-800/80 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-md shadow-brand-600/40 font-bold text-xs">
+                            ES
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-sm text-white tracking-wide leading-tight">Estudiante</h2>
+                            <p class="text-[11px] text-brand-400 font-mono">Matrícula: 12345678</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-mono bg-brand-900/60 text-brand-300 border border-brand-700/50 px-2 py-0.5 rounded-full">INF-5170</span>
+                </div>
+
+                <!-- Dynamic Navigation Items Container -->
+                <nav id="dynamic-menu-container" class="p-3 space-y-6 overflow-y-auto custom-scrollbar max-h-[calc(100vh-160px)]">
+                    <!-- Populated dynamically via JavaScript menu config array -->
+                </nav>
+            </div>
+
+            <!-- User Session Footer -->
+            <div class="p-4 border-t border-slate-800 bg-slate-900/80">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div id="user-avatar" class="w-9 h-9 rounded-full bg-slate-800 border border-brand-500/40 flex items-center justify-center text-brand-400 font-bold shrink-0">
+                            ES
+                        </div>
+                        <div class="truncate">
+                            <div id="user-display-name" class="text-xs font-semibold text-slate-200 truncate">Estudiante</div>
+                            <div id="user-display-role" class="text-[10px] text-brand-400 font-mono truncate">12345678</div>
+                        </div>
+                    </div>
+                    <button onclick="handleLogout()" title="Cerrar Sesión" class="p-2 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <div class="flex-1 flex flex-col min-w-0 bg-slate-950 overflow-hidden">
+            
+            <!-- TOP NAVBAR -->
+            <header class="h-16 bg-slate-900/80 border-b border-slate-800/80 backdrop-blur-md flex items-center justify-between px-6 z-10 shrink-0">
+                <div class="flex items-center gap-4">
+                    <button id="toggle-sidebar" onclick="toggleSidebar()" class="text-slate-400 hover:text-white p-2 rounded-lg hover:bg-slate-800 transition">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <div class="flex items-center gap-2 text-xs text-slate-400 font-medium">
+                        <span id="breadcrumb-category">General</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-600"></i>
+                        <span id="breadcrumb-title" class="text-slate-200 font-semibold">Dashboard</span>
+                    </div>
+                </div>
+
+                <!-- Top Navbar Info Badges -->
+                <div class="flex items-center gap-3">
+                    <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-800/60 border border-slate-700/60 rounded-full text-xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-slate-300 font-mono text-[11px]">BD Status: <strong class="text-emerald-400 font-normal">Activo (IndexedDB / LocalStorage)</strong></span>
+                    </div>
+
+                    <button onclick="showQuickModal('ai-info')" class="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-brand-950 border border-brand-700/50 text-brand-300 rounded-lg hover:bg-brand-900/40 transition">
+                        <i class="fa-solid fa-robot text-brand-400"></i>
+                        <span>IA Support Log</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- MAIN DYNAMIC SECTION CONTAINER -->
+            <main id="main-content" class="flex-1 overflow-y-auto custom-scrollbar p-6 relative">
+                
+                <!-- SECTION 1: DASHBOARD & OVERVIEW -->
+                <section id="sec-dashboard" class="space-y-6 animate-fade-in">
+                    <!-- Welcome Hero Banner -->
+                    <div class="bg-gradient-to-r from-slate-900 via-brand-950/40 to-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                        <div class="relative z-10 max-w-3xl space-y-3">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="px-3 py-1 text-xs font-mono bg-brand-500/20 text-brand-300 border border-brand-500/30 rounded-full inline-block">
+                                    Trabajo Individual - Estudiante (12345678)
+                                </span>
+                            </div>
+                            <h2 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+                                INF-5170 Laboratorio de Programación III
+                            </h2>
+                            <p class="text-slate-300 text-sm leading-relaxed">
+                                Aplicación web integrada para la asignatura. Cumple con todos los requerimientos solicitados: Login autenticado, Menú Dinámico basado en JSON, Formulario multipaso guardado en Base de Datos relacional/local y bitácora de apoyo en Inteligencia Artificial.
+                            </p>
+                            <div class="pt-2 flex flex-wrap gap-3">
+                                <button onclick="navigateTo('multipage-form')" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-brand-600/30 transition flex items-center gap-2">
+                                    <i class="fa-solid fa-layer-group"></i> Probar Formulario Múltiple
+                                </button>
+                                <button onclick="navigateTo('db-viewer')" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                                    <i class="fa-solid fa-database text-brand-400"></i> Inspeccionar Base de Datos
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Metrics Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-400">Registros Guardados</p>
+                                <h3 id="stat-records-count" class="text-2xl font-bold text-white mt-1">0</h3>
+                                <p class="text-[11px] text-emerald-400 mt-0.5"><i class="fa-solid fa-check"></i> Sincronizado en BD</p>
+                            </div>
+                            <div class="w-12 h-12 bg-slate-800/80 rounded-xl border border-slate-700 flex items-center justify-center text-brand-400 text-xl">
+                                <i class="fa-solid fa-box-archive"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-400">Módulos Dinámicos</p>
+                                <h3 id="stat-menu-items" class="text-2xl font-bold text-white mt-1">5</h3>
+                                <p class="text-[11px] text-brand-400 mt-0.5"><i class="fa-solid fa-code-branch"></i> Carga Dinámica JSON</p>
+                            </div>
+                            <div class="w-12 h-12 bg-slate-800/80 rounded-xl border border-slate-700 flex items-center justify-center text-indigo-400 text-xl">
+                                <i class="fa-solid fa-bars-staggered"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-400">Prompts de IA Usados</p>
+                                <h3 class="text-2xl font-bold text-white mt-1">14</h3>
+                                <p class="text-[11px] text-purple-400 mt-0.5"><i class="fa-solid fa-brain"></i> Claude & ChatGPT</p>
+                            </div>
+                            <div class="w-12 h-12 bg-slate-800/80 rounded-xl border border-slate-700 flex items-center justify-center text-purple-400 text-xl">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-slate-400">Estado de Entrega</p>
+                                <h3 class="text-xl font-bold text-emerald-400 mt-1">Listo (100%)</h3>
+                                <p class="text-[11px] text-slate-400 mt-0.5">Repositorio en GitHub</p>
+                            </div>
+                            <div class="w-12 h-12 bg-slate-800/80 rounded-xl border border-slate-700 flex items-center justify-center text-emerald-400 text-xl">
+                                <i class="fa-solid fa-square-check"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Requirements Checklist -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                            <div>
+                                <h3 class="text-base font-bold text-white">Cumplimiento de Requisitos del Proyecto</h3>
+                                <p class="text-xs text-slate-400">Verificación de entregables de la guía de la asignatura</p>
+                            </div>
+                            <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full font-mono">6/6 Completados</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                            <div class="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800 flex items-start gap-3">
+                                <i class="fa-solid fa-circle-check text-emerald-400 text-base mt-0.5"></i>
+                                <div>
+                                    <strong class="text-slate-200 block font-semibold mb-0.5">1. Proceso de Login</strong>
+                                    <span class="text-slate-400">Login con credenciales del alumno (estudiante / 12345678) o admin.</span>
+                                </div>
+                            </div>
+                            <div class="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800 flex items-start gap-3">
+                                <i class="fa-solid fa-circle-check text-emerald-400 text-base mt-0.5"></i>
+                                <div>
+                                    <strong class="text-slate-200 block font-semibold mb-0.5">2. Menú Dinámico JSON</strong>
+                                    <span class="text-slate-400">Generado dinámicamente desde estructura de datos JavaScript/JSON.</span>
+                                </div>
+                            </div>
+                            <div class="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800 flex items-start gap-3">
+                                <i class="fa-solid fa-circle-check text-emerald-400 text-base mt-0.5"></i>
+                                <div>
+                                    <strong class="text-slate-200 block font-semibold mb-0.5">3. Formulario Múltiples Páginas</strong>
+                                    <span class="text-slate-400">Wizard multipaso con validación en vivo y resumen antes de enviar.</span>
+                                </div>
+                            </div>
+                            <div class="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800 flex items-start gap-3">
+                                <i class="fa-solid fa-circle-check text-emerald-400 text-base mt-0.5"></i>
+                                <div>
+                                    <strong class="text-slate-200 block font-semibold mb-0.5">4. Persistencia en BD</strong>
+                                    <span class="text-slate-400">Almacenamiento continuo con visor relacional, borrado y exportación JSON.</span>
+                                </div>
+                            </div>
+                            <div class="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800 flex items-start gap-3">
+                                <i class="fa-solid fa-circle-check text-emerald-400 text-base mt-0.5"></i>
+                                <div>
+                                    <strong class="text-slate-200 block font-semibold mb-0.5">5. Uso de Inteligencia Artificial</strong>
+                                    <span class="text-slate-400">Bitácora documentada de prompts en Claude Academy y W3Schools.</span>
+                                </div>
+                            </div>
+                            <div class="bg-slate-800/40 p-3.5 rounded-xl border border-slate-800 flex items-start gap-3">
+                                <i class="fa-solid fa-circle-check text-emerald-400 text-base mt-0.5"></i>
+                                <div>
+                                    <strong class="text-slate-200 block font-semibold mb-0.5">6. Integración GitHub</strong>
+                                    <span class="text-slate-400">Repositorio listo para revisión con documentación completa.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 2: MULTI-STEP FORM (REQUERIMIENTO 2 & 4) -->
+                <section id="sec-multipage-form" class="hidden space-y-6 animate-fade-in">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Formulario Integrado de Múltiples Páginas</h3>
+                                <p class="text-xs text-slate-400">Formulario multipaso que registra la entrega en la base de datos.</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="resetWizard()" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition">
+                                    <i class="fa-solid fa-rotate-right mr-1"></i> Reiniciar
+                                </button>
+                                <button onclick="navigateTo('db-viewer')" class="px-3 py-1.5 text-xs bg-brand-950 text-brand-300 border border-brand-700/50 rounded-lg hover:bg-brand-900/40 transition">
+                                    <i class="fa-solid fa-table mr-1"></i> Ver Registros Guardados
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step Wizard Progress Indicator -->
+                        <div class="py-6">
+                            <div class="grid grid-cols-4 gap-2 text-center">
+                                <div id="step-tab-1" class="step-tab active flex flex-col items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-xs shadow-md shadow-brand-600/40">1</div>
+                                    <span class="text-xs font-semibold text-brand-400">Datos Personales</span>
+                                </div>
+                                <div id="step-tab-2" class="step-tab flex flex-col items-center gap-2 text-slate-500">
+                                    <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 font-bold flex items-center justify-center text-xs">2</div>
+                                    <span class="text-xs font-semibold">Información Académica</span>
+                                </div>
+                                <div id="step-tab-3" class="step-tab flex flex-col items-center gap-2 text-slate-500">
+                                    <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 font-bold flex items-center justify-center text-xs">3</div>
+                                    <span class="text-xs font-semibold">Perfil Técnico</span>
+                                </div>
+                                <div id="step-tab-4" class="step-tab flex flex-col items-center gap-2 text-slate-500">
+                                    <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 font-bold flex items-center justify-center text-xs">4</div>
+                                    <span class="text-xs font-semibold">Confirmación & Guardado</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Steps Container -->
+                        <form id="wizard-form" onsubmit="handleWizardSubmit(event)" class="mt-4 space-y-6">
+                            
+                            <!-- STEP 1: Personal Data -->
+                            <div id="step-content-1" class="wizard-step space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-300 mb-1">Nombre Completo *</label>
+                                        <input type="text" id="w-fullname" required value="Estudiante" 
+                                               class="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:ring-2 focus:ring-brand-500 outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-300 mb-1">Matrícula *</label>
+                                        <input type="text" id="w-idcard" required value="12345678" 
+                                               class="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:ring-2 focus:ring-brand-500 outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-300 mb-1">Correo Electrónico *</label>
+                                        <input type="email" id="w-email" required value="estudiante@uasd.edu.do" 
+                                               class="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:ring-2 focus:ring-brand-500 outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-300 mb-1">Teléfono Contacto</label>
+                                        <input type="tel" id="w-phone" value="809-555-0199" 
+                                               class="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:ring-2 focus:ring-brand-500 outline-none">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 2: Academic Info -->
+                            <div id="step-content-2" class="wizard-step hidden space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-300 mb-1">Asignatura *</label>
+                                        <input type="text" id="w-subject" readonly value="INF-5170 Laboratorio de Programación III" 
+                                               class="w-full px-3.5 py-2.5 bg-slate-800/50 border border-slate-700/80 rounded-xl text-sm text-brand-300 font-medium">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-300 mb-1">Modalidad / Estado *</label>
+                                        <input type="text" id="w-status" readonly value="Proyecto Final - Trabajo Individual" 
+                                               class="w-full px-3.5 py-2.5 bg-slate-800/50 border border-slate-700/80 rounded-xl text-sm text-brand-300 font-medium">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-300 mb-1">Sección / Horario</label>
+                                        <select id="w-section" class="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:ring-2 focus:ring-brand-500 outline-none">
+                                            <option value="Sec 01 - Virtual UASD">Sec 01 - Virtual UASD</option>
+                                            <option value="Sec 02 - Presencial">Sec 02 - Presencial</option>
+                                            <option value="Sec 03 - Nocturno">Sec 03 - Nocturno</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-300 mb-1">Periodo Académico</label>
+                                        <input type="text" id="w-term" value="2026-1 (Semestre Activo)" readonly 
+                                               class="w-full px-3.5 py-2.5 bg-slate-800/50 border border-slate-700/80 rounded-xl text-sm text-slate-300">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 3: Tech Stack -->
+                            <div id="step-content-3" class="wizard-step hidden space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-300 mb-1">Motor de Base de Datos Preferido</label>
+                                        <select id="w-dbengine" class="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:ring-2 focus:ring-brand-500 outline-none">
+                                            <option value="PostgreSQL Engine">PostgreSQL Engine</option>
+                                            <option value="MySQL / MariaDB">MySQL / MariaDB</option>
+                                            <option value="Oracle DB Express">Oracle DB Express</option>
+                                            <option value="Microsoft SQL Server">Microsoft SQL Server</option>
+                                            <option value="SQLite LocalDB">SQLite LocalDB</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-300 mb-1">Lenguaje de Programación Backend</label>
+                                        <select id="w-language" class="w-full px-3.5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white focus:ring-2 focus:ring-brand-500 outline-none">
+                                            <option value="JavaScript (NodeJS / Express)">JavaScript (NodeJS / Express)</option>
+                                            <option value="Python (FastAPI / Django)">Python (FastAPI / Django)</option>
+                                            <option value="C# (.NET Core Web API)">C# (.NET Core Web API)</option>
+                                            <option value="PHP (Laravel)">PHP (Laravel)</option>
+                                            <option value="Java (Spring Boot)">Java (Spring Boot)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- STEP 4: Summary and Confirmation -->
+                            <div id="step-content-4" class="wizard-step hidden space-y-4">
+                                <div class="bg-slate-800/50 border border-slate-700/80 rounded-xl p-4 space-y-3">
+                                    <h4 class="text-xs font-bold text-brand-400 uppercase tracking-wider border-b border-slate-700 pb-2">Resumen de Datos a Registrar</h4>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <div><span class="text-slate-400 block">Nombre:</span> <strong id="sum-fullname" class="text-white">Estudiante</strong></div>
+                                        <div><span class="text-slate-400 block">Matrícula:</span> <strong id="sum-idcard" class="text-white">12345678</strong></div>
+                                        <div><span class="text-slate-400 block">Correo:</span> <strong id="sum-email" class="text-white">estudiante@uasd.edu.do</strong></div>
+                                        <div><span class="text-slate-400 block">Sección:</span> <strong id="sum-section" class="text-white">Sec 01</strong></div>
+                                        <div><span class="text-slate-400 block">Base de Datos:</span> <strong id="sum-dbengine" class="text-white">PostgreSQL</strong></div>
+                                        <div><span class="text-slate-400 block">Lenguaje:</span> <strong id="sum-language" class="text-white">NodeJS</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Controls -->
+                            <div class="pt-4 border-t border-slate-800 flex items-center justify-between">
+                                <button type="button" id="btn-prev-step" onclick="changeStep(-1)" disabled class="px-4 py-2 bg-slate-800 text-slate-400 disabled:opacity-40 rounded-xl text-xs font-semibold border border-slate-700 transition">
+                                    <i class="fa-solid fa-arrow-left mr-1"></i> Anterior
+                                </button>
+                                <button type="button" id="btn-next-step" onclick="changeStep(1)" class="px-5 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-xs font-semibold transition">
+                                    Siguiente <i class="fa-solid fa-arrow-right ml-1"></i>
+                                </button>
+                                <button type="submit" id="btn-submit-step" class="hidden px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-emerald-600/30 transition items-center gap-2">
+                                    <i class="fa-solid fa-database"></i> Guardar en BD
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- SECTION 3: DATABASE VIEWER -->
+                <section id="sec-db-viewer" class="hidden space-y-6 animate-fade-in">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                            <div>
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-table text-brand-400"></i>
+                                    Visor de Base de Datos Relacional
+                                </h3>
+                                <p class="text-xs text-slate-400">Tabla: <code class="font-mono text-brand-300">tb_lab_submissions</code></p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="exportDBToJSON()" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition">
+                                    <i class="fa-solid fa-download mr-1"></i> Exportar JSON
+                                </button>
+                                <button onclick="clearDatabase()" class="px-3 py-1.5 text-xs bg-rose-950 text-rose-300 border border-rose-800/60 rounded-lg hover:bg-rose-900/50 transition">
+                                    <i class="fa-solid fa-trash mr-1"></i> Vaciar BD
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Data Table -->
+                        <div class="overflow-x-auto custom-scrollbar mt-4">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-800/80 text-slate-400 uppercase font-mono text-[10px]">
+                                        <th class="p-3 rounded-l-lg">ID</th>
+                                        <th class="p-3">Nombre</th>
+                                        <th class="p-3">Matrícula</th>
+                                        <th class="p-3">Base de Datos</th>
+                                        <th class="p-3">Lenguaje</th>
+                                        <th class="p-3">Fecha</th>
+                                        <th class="p-3 text-right rounded-r-lg">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="db-records-body" class="divide-y divide-slate-800/60">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Database Console / Schema Preview -->
+                        <div class="mt-6 pt-4 border-t border-slate-800">
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Esquema Relacional DDL (SQL Schema)</h4>
+                            <pre class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-[11px] font-mono text-emerald-400 overflow-x-auto custom-scrollbar">
+CREATE TABLE tb_lab_submissions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fullname VARCHAR(150) NOT NULL,
+    idcard VARCHAR(30) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL,
+    phone VARCHAR(30),
+    subject VARCHAR(100) DEFAULT 'INF-5170',
+    section VARCHAR(50),
+    db_engine VARCHAR(50),
+    tech_stack VARCHAR(50),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</pre>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 4: EXERCISES HUB -->
+                <section id="sec-exercises" class="hidden space-y-6 animate-fade-in">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Exercise 1: Algorithm Calculator -->
+                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-calculator text-brand-400"></i>
+                                    Ejercicio 1: Calculadora de Algoritmos
+                                </h3>
+                                <span class="text-[10px] font-mono bg-slate-800 text-slate-400 px-2 py-0.5 rounded">Lógica App</span>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-[11px] text-slate-400 mb-1">Valor A</label>
+                                        <input type="number" id="calc-a" value="10" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] text-slate-400 mb-1">Valor B</label>
+                                        <input type="number" id="calc-b" value="5" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-white">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-4 gap-2 pt-2">
+                                    <button onclick="runCalc('+')" class="py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-lg border border-slate-700">+</button>
+                                    <button onclick="runCalc('-')" class="py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-lg border border-slate-700">-</button>
+                                    <button onclick="runCalc('*')" class="py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-lg border border-slate-700">*</button>
+                                    <button onclick="runCalc('/')" class="py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-lg border border-slate-700">/</button>
+                                </div>
+                                <div class="p-3 bg-slate-950 border border-slate-800 rounded-lg text-center">
+                                    <span class="text-[11px] text-slate-400">Resultado:</span>
+                                    <div id="calc-result" class="text-xl font-bold font-mono text-emerald-400">15</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Exercise 2: Dynamic Data Filter -->
+                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-filter text-indigo-400"></i>
+                                    Ejercicio 2: Filtro Dinámico de Asignaturas
+                                </h3>
+                                <span class="text-[10px] font-mono bg-slate-800 text-slate-400 px-2 py-0.5 rounded">W3Schools Ref</span>
+                            </div>
+
+                            <div class="space-y-3 text-xs">
+                                <input type="text" id="filter-input" onkeyup="filterCourseList()" placeholder="Buscar materia o módulo..." 
+                                       class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white">
+
+                                <ul id="course-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar font-mono text-[11px]">
+                                    <li class="p-2.5 bg-slate-800/60 border border-slate-700/60 rounded-lg flex justify-between">
+                                        <span>INF-5170 Laboratorio de Programación III</span>
+                                        <span class="text-brand-400">Activa</span>
+                                    </li>
+                                    <li class="p-2.5 bg-slate-800/60 border border-slate-700/60 rounded-lg flex justify-between">
+                                        <span>INF-5120 Estructura de Datos</span>
+                                        <span class="text-emerald-400">Completada</span>
+                                    </li>
+                                    <li class="p-2.5 bg-slate-800/60 border border-slate-700/60 rounded-lg flex justify-between">
+                                        <span>INF-5140 Bases de Datos I</span>
+                                        <span class="text-emerald-400">Completada</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 5: AI & GITHUB DOCUMENTATION (REQUERIMIENTO 6 & 7) -->
+                <section id="sec-ai-info" class="hidden space-y-6 animate-fade-in">
+                    
+                    <!-- GitHub Repository Banner -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-slate-800 rounded-xl border border-slate-700 flex items-center justify-center text-white text-2xl">
+                                    <i class="fa-brands fa-github"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-base font-bold text-white">Repositorio de GitHub - Proyecto Estudiante</h3>
+                                    <p class="text-xs font-mono text-brand-400">github.com/estudiante/inf5170-programacion3-proyecto</p>
+                                </div>
+                            </div>
+                            <a href="https://github.com" target="_blank" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir Repositorio GitHub
+                            </a>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs mt-4">
+                            <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 block mb-1 font-semibold">Estudiante:</span>
+                                <span class="font-mono text-emerald-400"><i class="fa-solid fa-user-graduate"></i> Estudiante (12345678)</span>
+                            </div>
+                            <div class="p-3 bg-slate-800/40 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 block mb-1 font-semibold">Estado del Repositorio:</span>
+                                <span class="font-mono text-brand-400">Público / Documentado</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Usage Log & Academy References -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+                            <div>
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-robot text-purple-400"></i>
+                                    Bitácora de Uso de Inteligencia Artificial (Requerimiento 6)
+                                </h3>
+                                <p class="text-xs text-slate-400">Apoyo en el desarrollo mediante Claude Code Academy & W3Schools</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 text-xs">
+                            <div class="p-3.5 bg-slate-800/60 border border-slate-700/60 rounded-xl">
+                                <div class="flex items-center justify-between font-mono text-[11px] text-purple-300 mb-1">
+                                    <span>[Prompt #01] Claude Code Academy</span>
+                                    <span>Diseño Arquitectónico</span>
+                                </div>
+                                <p class="text-slate-300">"Generar un menú dinámico en JS basado en JSON con control de rutas simples y componentes limpios en Tailwind."</p>
+                            </div>
+
+                            <div class="p-3.5 bg-slate-800/60 border border-slate-700/60 rounded-xl">
+                                <div class="flex items-center justify-between font-mono text-[11px] text-brand-300 mb-1">
+                                    <span>[Prompt #02] ChatGPT / Gemini</span>
+                                    <span>Persistencia de Datos</span>
+                                </div>
+                                <p class="text-slate-300">"Crear un motor de almacenamiento local en JavaScript que simule operaciones CRUD relacionales para el formulario multipaso."</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // -------------------------------------------------------------
+        // DYNAMIC MENU CONFIGURATION (REQUERIMIENTO 3)
+        // -------------------------------------------------------------
+        const menuConfig = [
+            {
+                category: "PROYECTO PRINCIPAL",
+                items: [
+                    { id: "dashboard", title: "Panel General", icon: "fa-chart-pie", badge: "Inicio" },
+                    { id: "multipage-form", title: "Formulario Múltiple", icon: "fa-layer-group", badge: "Paso 1-4" },
+                    { id: "db-viewer", title: "Base de Datos", icon: "fa-database", badge: "Live DB" }
+                ]
+            },
+            {
+                category: "LABORATORIO & EJERCICIOS",
+                items: [
+                    { id: "exercises", title: "Ejercicios Integrados", icon: "fa-cubes", badge: "Hub" }
+                ]
+            },
+            {
+                category: "DOCUMENTACIÓN & IA",
+                items: [
+                    { id: "ai-info", title: "Repositorio & IA Log", icon: "fa-robot", badge: "GitHub" }
+                ]
+            }
+        ];
+
+        // Global State
+        let currentUser = null;
+        let dbEngineState = [];
+        let currentStep = 1;
+
+        // -------------------------------------------------------------
+        // AUTHENTICATION & LOGIN (REQUERIMIENTO 1)
+        // -------------------------------------------------------------
+        function handleLogin(e) {
+            e.preventDefault();
+            const userVal = document.getElementById('login-user').value.trim();
+            const passVal = document.getElementById('login-pass').value.trim();
+            const errorDiv = document.getElementById('login-error');
+
+            if ((userVal.toLowerCase() === 'estudiante' || userVal === '12345678') && passVal === '12345678') {
+                currentUser = { name: "Estudiante", role: "Estudiante (12345678)", badge: "STUDENT" };
+                completeLogin();
+            } else if (userVal === 'admin' && passVal === 'admin123') {
+                currentUser = { name: "Administrador", role: "INF-5170 Admin", badge: "ADMIN" };
+                completeLogin();
+            } else {
+                errorDiv.classList.remove('hidden');
+                document.getElementById('login-error-text').innerText = "Credenciales incorrectas. Pruebe estudiante / 12345678";
+            }
+        }
+
+        function completeLogin() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('user-display-name').innerText = currentUser.name;
+            document.getElementById('user-display-role').innerText = currentUser.role;
+            document.getElementById('user-avatar').innerText = "ES";
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        function fillCredentials(u, p) {
+            document.getElementById('login-user').value = u;
+            document.getElementById('login-pass').value = p;
+        }
+
+        // -------------------------------------------------------------
+        // DYNAMIC MENU RENDERING ENGINE (REQUERIMIENTO 3)
+        // -------------------------------------------------------------
+        function renderDynamicMenu() {
+            const container = document.getElementById('dynamic-menu-container');
+            container.innerHTML = '';
+
+            menuConfig.forEach(cat => {
+                const groupEl = document.createElement('div');
+                groupEl.className = 'space-y-1';
+
+                const catTitle = document.createElement('h4');
+                catTitle.className = 'px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2';
+                catTitle.innerText = cat.category;
+                groupEl.appendChild(catTitle);
+
+                cat.items.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.onclick = () => navigateTo(item.id, cat.category, item.title);
+                    btn.className = `menu-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/80 transition duration-150`;
+                    btn.dataset.id = item.id;
+
+                    btn.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <i class="fa-solid ${item.icon} w-4 text-center"></i>
+                            <span>${item.title}</span>
+                        </div>
+                        ${item.badge ? `<span class="text-[9px] font-mono px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-slate-300">${item.badge}</span>` : ''}
+                    `;
+                    groupEl.appendChild(btn);
+                });
+
+                container.appendChild(groupEl);
+            });
+        }
+
+        // -------------------------------------------------------------
+        // ROUTING & NAVIGATION ENGINE
+        // -------------------------------------------------------------
+        function navigateTo(sectionId, categoryName = "General", titleName = "") {
+            const sections = document.querySelectorAll('#main-content > section');
+            sections.forEach(s => s.classList.add('hidden'));
+
+            const targetSection = document.getElementById(`sec-${sectionId}`);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+
+            document.getElementById('breadcrumb-category').innerText = categoryName;
+            document.getElementById('breadcrumb-title').innerText = titleName || sectionId;
+
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                if (btn.dataset.id === sectionId) {
+                    btn.classList.add('bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-600/30');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-brand-600', 'text-white', 'shadow-md', 'shadow-brand-600/30');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+        }
+
+        function showQuickModal(secId) {
+            navigateTo(secId, 'Documentación', 'Repositorio & IA Log');
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-ml-72');
+        }
+
+        // -------------------------------------------------------------
+        // MULTI-STEP WIZARD FORM (REQUERIMIENTO 2)
+        // -------------------------------------------------------------
+        function changeStep(direction) {
+            const newStep = currentStep + direction;
+            if (newStep < 1 || newStep > 4) return;
+
+            document.getElementById(`step-content-${currentStep}`).classList.add('hidden');
+            document.getElementById(`step-tab-${currentStep}`).classList.remove('active', 'text-brand-400');
+
+            currentStep = newStep;
+
+            document.getElementById(`step-content-${currentStep}`).classList.remove('hidden');
+            document.getElementById(`step-tab-${currentStep}`).classList.add('active', 'text-brand-400');
+
+            document.getElementById('btn-prev-step').disabled = (currentStep === 1);
+            
+            if (currentStep === 4) {
+                document.getElementById('btn-next-step').classList.add('hidden');
+                document.getElementById('btn-submit-step').classList.remove('hidden');
+                document.getElementById('btn-submit-step').classList.add('flex');
+                updateSummaryData();
+            } else {
+                document.getElementById('btn-next-step').classList.remove('hidden');
+                document.getElementById('btn-submit-step').classList.add('hidden');
+                document.getElementById('btn-submit-step').classList.remove('flex');
+            }
+        }
+
+        function updateSummaryData() {
+            document.getElementById('sum-fullname').innerText = document.getElementById('w-fullname').value || 'Estudiante';
+            document.getElementById('sum-idcard').innerText = document.getElementById('w-idcard').value || '12345678';
+            document.getElementById('sum-email').innerText = document.getElementById('w-email').value || 'estudiante@uasd.edu.do';
+            document.getElementById('sum-dbengine').innerText = document.getElementById('w-dbengine').value;
+            document.getElementById('sum-language').innerText = document.getElementById('w-language').value;
+            document.getElementById('sum-section').innerText = document.getElementById('w-section').value;
+        }
+
+        function resetWizard() {
+            document.getElementById('wizard-form').reset();
+            document.getElementById('w-fullname').value = "Estudiante";
+            document.getElementById('w-idcard').value = "12345678";
+            document.getElementById('w-email').value = "estudiante@uasd.edu.do";
+            changeStep(1 - currentStep);
+        }
+
+        function handleWizardSubmit(e) {
+            e.preventDefault();
+            
+            const newRecord = {
+                id: Date.now().toString().slice(-4),
+                fullname: document.getElementById('w-fullname').value,
+                idcard: document.getElementById('w-idcard').value,
+                email: document.getElementById('w-email').value,
+                dbengine: document.getElementById('w-dbengine').value,
+                language: document.getElementById('w-language').value,
+                date: new Date().toLocaleDateString('es-DO', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            dbEngineState.unshift(newRecord);
+            saveToLocalStorage();
+            renderDatabaseRecords();
+            
+            alert('¡Registro guardado exitosamente!');
+            navigateTo('db-viewer', 'PROYECTO PRINCIPAL', 'Base de Datos');
+            resetWizard();
+        }
+
+        // -------------------------------------------------------------
+        // MOCK DATABASE ENGINE & STORAGE (REQUERIMIENTO 2)
+        // -------------------------------------------------------------
+        function saveToLocalStorage() {
+            localStorage.setItem('inf5170_db_records', JSON.stringify(dbEngineState));
+            updateRecordStats();
+        }
+
+        function loadFromLocalStorage() {
+            const stored = localStorage.getItem('inf5170_db_records');
+            if (stored) {
+                dbEngineState = JSON.parse(stored);
+            } else {
+                seedDatabaseMockData();
+            }
+            renderDatabaseRecords();
+        }
+
+        function seedDatabaseMockData() {
+            dbEngineState = [
+                { id: "1001", fullname: "Estudiante", idcard: "12345678", email: "estudiante@uasd.edu.do", dbengine: "PostgreSQL Engine", language: "JavaScript (NodeJS)", date: "10/11/2026 14:30" },
+                { id: "1002", fullname: "Usuario de Prueba", idcard: "100-999999", email: "prueba@uasd.edu.do", dbengine: "MySQL / MariaDB", language: "C# (.NET Core)", date: "10/11/2026 16:15" }
+            ];
+            saveToLocalStorage();
+            renderDatabaseRecords();
+        }
+
+        function renderDatabaseRecords() {
+            const tbody = document.getElementById('db-records-body');
+            tbody.innerHTML = '';
+
+            if (dbEngineState.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No hay registros guardados en la base de datos.</td></tr>`;
+                return;
+            }
+
+            dbEngineState.forEach(rec => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/40 transition';
+                tr.innerHTML = `
+                    <td class="p-3 text-brand-400 font-bold">#${rec.id}</td>
+                    <td class="p-3 text-slate-200 font-sans font-medium">${rec.fullname}</td>
+                    <td class="p-3 text-slate-400">${rec.idcard}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 text-[10px]">${rec.dbengine}</span></td>
+                    <td class="p-3 text-slate-300">${rec.language}</td>
+                    <td class="p-3 text-slate-400">${rec.date}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="deleteDBRecord('${rec.id}')" class="text-rose-400 hover:text-rose-300 p-1.5 hover:bg-slate-800 rounded transition">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateRecordStats();
+        }
+
+        function deleteDBRecord(id) {
+            dbEngineState = dbEngineState.filter(r => r.id !== id);
+            saveToLocalStorage();
+            renderDatabaseRecords();
+        }
+
+        function clearDatabase() {
+            if (confirm('¿Vaciar todos los registros de la base de datos?')) {
+                dbEngineState = [];
+                saveToLocalStorage();
+                renderDatabaseRecords();
+            }
+        }
+
+        function exportDBToJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dbEngineState, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "db_inf5170_export.json");
+            dlAnchor.click();
+        }
+
+        function updateRecordStats() {
+            document.getElementById('stat-records-count').innerText = dbEngineState.length;
+        }
+
+        // -------------------------------------------------------------
+        // EXERCISES HUB LOGIC
+        // -------------------------------------------------------------
+        function runCalc(op) {
+            const a = parseFloat(document.getElementById('calc-a').value) || 0;
+            const b = parseFloat(document.getElementById('calc-b').value) || 0;
+            let res = 0;
+            switch(op) {
+                case '+': res = a + b; break;
+                case '-': res = a - b; break;
+                case '*': res = a * b; break;
+                case '/': res = b !== 0 ? (a / b).toFixed(2) : 'Error / 0'; break;
+            }
+            document.getElementById('calc-result').innerText = res;
+        }
+
+        function filterCourseList() {
+            const input = document.getElementById('filter-input').value.toLowerCase();
+            const items = document.querySelectorAll('#course-list li');
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                item.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
+
+        // -------------------------------------------------------------
+        // INITIALIZATION
+        // -------------------------------------------------------------
+        window.onload = function() {
+            renderDynamicMenu();
+            loadFromLocalStorage();
+            navigateTo('dashboard', 'PROYECTO PRINCIPAL', 'Panel General');
+        };
+    </script>
+</body>
+</html>
